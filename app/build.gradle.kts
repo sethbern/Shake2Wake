@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.smartsensingfinal"
+    namespace = "com.example.shake2wakefinalproject"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.smartsensingfinal"
+        applicationId = "com.example.shake2wakefinalproject"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

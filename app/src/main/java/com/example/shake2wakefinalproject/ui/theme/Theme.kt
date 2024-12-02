@@ -1,4 +1,4 @@
-package com.example.smartsensingfinal.ui.theme
+package com.example.shake2wakefinalproject.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun SmartSensingFinalTheme(
+fun Shake2WakeFinalProjectTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

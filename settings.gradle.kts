@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SmartSensingFinal"
+rootProject.name = "Shake2WakeFinalProject"
 include(":app")
  

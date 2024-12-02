@@ -1,4 +1,4 @@
-package com.example.smartsensingfinal
+package com.example.shake2wakefinalproject
 
 import org.junit.Test
 

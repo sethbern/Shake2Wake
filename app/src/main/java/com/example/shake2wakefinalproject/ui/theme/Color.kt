@@ -1,4 +1,4 @@
-package com.example.smartsensingfinal.ui.theme
+package com.example.shake2wakefinalproject.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
