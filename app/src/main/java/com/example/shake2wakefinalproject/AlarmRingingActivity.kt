@@ -1,20 +1,34 @@
 package com.example.shake2wakefinalproject
 
 import android.app.AlertDialog
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
-class AlarmRingingActivity : AppCompatActivity() {
+class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
 
     private var solution: Int = 0
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var shakeThreshold = 2.5f // Adjusted for realistic shake detection
+    private var lastUpdate: Long = 0
+    private var mathSolved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alarm_ringing)
+
+        // Initialize the accelerometer
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometer?.let {
+            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+        }
 
         // Get the math problem and solution from the intent
         val problem = intent.getStringExtra("MATH_PROBLEM") ?: ""
@@ -23,38 +37,70 @@ class AlarmRingingActivity : AppCompatActivity() {
         val ringingMessage: TextView = findViewById(R.id.ringingMessage)
         ringingMessage.text = "Solve: $problem"
 
-        val stopAlarmButton: Button = findViewById(R.id.stopAlarmButton)
-        stopAlarmButton.setOnClickListener {
-            showMathDialog()
-        }
+        // Show the math problem dialog immediately
+        showMathDialog(problem)
     }
 
-    private fun showMathDialog() {
-        val inputField = EditText(this)
+    private fun showMathDialog(problem: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val inputField = android.widget.EditText(this)
         inputField.hint = "Enter your answer"
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Solve the problem to stop the alarm")
+        dialogBuilder.setTitle("Solve the problem")
+            .setMessage("What is $problem?")
             .setView(inputField)
             .setPositiveButton("Submit") { _, _ ->
                 val userAnswer = inputField.text.toString().toIntOrNull()
 
                 if (userAnswer == solution) {
-                    stopAlarm()
-                    Toast.makeText(this, "Correct! Alarm stopped!", Toast.LENGTH_SHORT).show()
+                    mathSolved = true
+                    val ringingMessage: TextView = findViewById(R.id.ringingMessage)
+                    ringingMessage.text = "Correct! Now shake your phone!"
                 } else {
                     Toast.makeText(this, "Wrong answer! Try again.", Toast.LENGTH_SHORT).show()
+                    showMathDialog(problem) // Show the dialog again
                 }
             }
-            .setNegativeButton("Cancel") { _, _ ->
-                Toast.makeText(this, "Alarm is still active!", Toast.LENGTH_SHORT).show()
-            }
+            .setCancelable(false) // Prevent user from dismissing the dialog
             .create()
-
-        dialog.show()
+            .show()
     }
 
     private fun stopAlarm() {
+        sensorManager.unregisterListener(this) // Unregister the accelerometer listener
         finish() // Close the activity when the alarm is stopped
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER && mathSolved) {
+            val values = event.values
+            val x = values[0]
+            val y = values[1]
+            val z = values[2]
+
+            val currentTime = System.currentTimeMillis()
+            if ((currentTime - lastUpdate) > 100) {
+                val diffTime = currentTime - lastUpdate
+                lastUpdate = currentTime
+
+                // Gravity compensation and shake detection
+                val gX = x / SensorManager.GRAVITY_EARTH
+                val gY = y / SensorManager.GRAVITY_EARTH
+                val gZ = z / SensorManager.GRAVITY_EARTH
+                val gForce = Math.sqrt((gX * gX + gY * gY + gZ * gZ).toDouble()).toFloat()
+
+                if (gForce > shakeThreshold) {
+                    Toast.makeText(this, "Shake detected! Alarm stopped!", Toast.LENGTH_SHORT).show()
+                    stopAlarm()
+                }
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sensorManager.unregisterListener(this)
     }
 }
