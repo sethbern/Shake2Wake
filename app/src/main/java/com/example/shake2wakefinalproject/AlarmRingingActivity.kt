@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.TextView
+import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -18,6 +19,9 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
     private var shakeThreshold = 2.5f // Adjusted for realistic shake detection
     private var lastUpdate: Long = 0
     private var mathSolved = false
+
+    private lateinit var mediaPlayer: MediaPlayer
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,11 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
 
         val ringingMessage: TextView = findViewById(R.id.ringingMessage)
         ringingMessage.text = "Solve: $problem"
+
+        // Initialize and start playing alarm sound
+        mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound) // Make sure alarm_sound.mp3 is in res/raw
+        mediaPlayer.isLooping = true
+        mediaPlayer.start()
 
         // Show the math problem dialog immediately
         showMathDialog(problem)
@@ -67,6 +76,12 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun stopAlarm() {
+
+        if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+
         sensorManager.unregisterListener(this) // Unregister the accelerometer listener
         finish() // Close the activity when the alarm is stopped
     }
