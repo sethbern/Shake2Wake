@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         val setAlarmButton: Button = findViewById(R.id.setAlarmButton)
 
-        // Set Alarm functionality
+        //Data Extraction: Initialize sensor and set up alarm functionality
         setAlarmButton.setOnClickListener {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 isAlarmSet = true
                 Toast.makeText(this, "Alarm set for $selectedHour:$selectedMinute", Toast.LENGTH_SHORT).show()
 
-                // Start monitoring alarm time
+                //Start monitoring alarm time
                 monitorAlarmTime()
             }, hour, minute, true)
 
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val calendar = Calendar.getInstance()
                 val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
                 val currentMinute = calendar.get(Calendar.MINUTE)
-
+                // Preprocessing: Compare current time to alarm time
                 if (currentHour == alarmHour && currentMinute == alarmMinute) {
                     runOnUiThread {
                         val intent = Intent(this, AlarmRingingActivity::class.java)
@@ -70,12 +70,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     break
                 }
 
-                Thread.sleep(1000) // Check every second
+                Thread.sleep(1000) //Preprocessing: Polling frequency for alarm check
             }
         }.start()
     }
 
     private fun generateMathProblem(): Pair<String, Int> {
+        // Feature Extraction: Generate math problem to present as a challenge
         val num1 = (1..10).random()
         val num2 = (1..10).random()
         val operation = listOf("+", "-").random()

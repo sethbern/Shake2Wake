@@ -26,11 +26,11 @@
         android:text="Set Alarm"
         android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/startAlarmButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Alarm"
-        android:layout_marginBottom="16dp" />
+<!--    <Button-->
+<!--        android:id="@+id/startAlarmButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Start Alarm"-->
+<!--        android:layout_marginBottom="16dp" />-->
 
 </LinearLayout>
