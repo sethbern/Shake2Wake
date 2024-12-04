@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.media.MediaPlayer
 
 class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
 
@@ -30,6 +31,7 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var speechRecognizer: SpeechRecognizer
     private lateinit var recognitionIntent: Intent
+    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +66,12 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
 
         val ringingMessage: TextView = findViewById(R.id.ringingMessage)
         ringingMessage.text = "Solve: $problem"
+
+        // Initialize and start playing alarm sound
+        mediaPlayer = MediaPlayer.create(this, R.raw.alarm_sound) // Make sure alarm_sound.mp3 is in res/raw
+        mediaPlayer.isLooping = true
+        mediaPlayer.start()
+
 
         showMathDialog(problem)
     }
@@ -146,6 +154,11 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun stopAlarm() {
+        if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+
         //Cleanup: Unregister listeners and release resources
         sensorManager.unregisterListener(this)
         speechRecognizer.destroy()
