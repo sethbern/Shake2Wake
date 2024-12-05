@@ -107,8 +107,12 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun startListening() {
-        //Data Extraction: Start listening for audio input
+        //Pause alarm sound while listening - fix from demo
+        if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+        }
 
+        // Data Extraction: Start listening for audio input
         speechRecognizer.startListening(recognitionIntent)
     }
 
@@ -125,8 +129,13 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
                     stopAlarm()
                 } else {
                     Toast.makeText(this@AlarmRingingActivity, "No sound detected. Try again.", Toast.LENGTH_SHORT).show()
+                    // Resume alarm sound if no match is found - fix from demo
+                    if (::mediaPlayer.isInitialized && !mediaPlayer.isPlaying) {
+                        mediaPlayer.start()
+                    }
                 }
             }
+
 
             override fun onError(error: Int) {
                 val errorMessage = when (error) {
@@ -154,16 +163,19 @@ class AlarmRingingActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun stopAlarm() {
-        if (::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
+        if (::mediaPlayer.isInitialized) {
+            if (mediaPlayer.isPlaying) {
+                mediaPlayer.stop()
+            }
             mediaPlayer.release()
         }
 
-        //Cleanup: Unregister listeners and release resources
+        // Cleanup: Unregister listeners and release resources
         sensorManager.unregisterListener(this)
         speechRecognizer.destroy()
         finish()
     }
+
 
     override fun onSensorChanged(event: SensorEvent?) {
         // Data Extraction: Capture accelerometer readings
